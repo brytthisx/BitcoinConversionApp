@@ -21,7 +21,7 @@ Aspire is a key component of this project, designed to facilitate the developmen
 
 ## Launching the Project
 To launch the project, follow these steps:
-1. Navigate to the project Root directory:
+1. Navigate to the project Root directory
 2. Install the required dependencies:
     ```dotnet restore```
 3. Start the application:
