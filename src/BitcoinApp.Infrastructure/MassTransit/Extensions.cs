@@ -23,20 +23,13 @@ public static class Extensions
 
             cfg.ConfigureMediator((context, cfg) =>
             {
-                //cfg.UseConsumeFilter(typeof(ValidationFilter<>), context, x => x.Include(type => !type.HasInterface<IDomainEvent>()));
-                //cfg.UseConsumeFilter(typeof(LoggingFilter<>), context, x => x.Include(type => !type.HasInterface<IDomainEvent>()));
-                //cfg.UseConsumeFilter(typeof(RedisFilter<>), context, x => x.Include(type => !type.HasInterface<IDomainEvent>()));
                 cfg.UseConsumeFilter(typeof(EventsFilter<>), context,
-                    x => x.Include(type => !type.HasInterface<IDomainEvent>()));
-                //cfg.UseConsumeFilter(typeof(HtmlSanitizerFilter<>), context, x => x.Include(type => !type.HasInterface<IDomainEvent>()));
+                   x => x.Include(type => !type.HasInterface<IDomainEvent>()));
             });
 
             builder.Services.AddMassTransit(x =>
             {
                 //below Consumers for RabbitMq
-                // x.AddConsumer<eventhandler>();
-
-                // x.AddConsumers(typeof(Domain).Assembly);
 
                 x.SetKebabCaseEndpointNameFormatter();
 

@@ -13,7 +13,6 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 
 builder.ConfigureDependencyInjection();
-// builder.AddSqlServerDbContext<AppDbContext>(connectionName: "database");
 builder.ConfigureDatabase();
 
 
@@ -24,8 +23,6 @@ builder.Services.AddOpenApi();
 
 
 // Add Aspire related items
-//builder.ConfigureOpenTelemetry();
-//builder.AddDefaultHealthChecks();
 
 WebApplication? app = builder.Build();
 

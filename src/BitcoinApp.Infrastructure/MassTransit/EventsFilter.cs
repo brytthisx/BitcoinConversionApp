@@ -34,7 +34,6 @@ public class EventsFilter<T>(
                     dateTimeProvider.UtcNow,
                     domainEvent.GetType().FullName,
                     domainEvent.GetType().Assembly.GetName().Name,
-                    //typeof(CustomerCreatedIntegrationEvent).Assembly.GetName().Name,
                     JsonConvert.SerializeObject(domainEvent,
                         new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.All })));
         }

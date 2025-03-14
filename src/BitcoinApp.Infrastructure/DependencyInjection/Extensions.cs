@@ -32,10 +32,6 @@ public static class Extensions
         {
             Dictionary<Type, IEventMapper> mappers = new()
             {
-                // { typeof(HistoryRecordCreatedDomainEvent), provider.GetRequiredService<eventmap>() },
-                // { typeof(HistoryRecordCreatedDomainEvent), new HistoryRecordCreatedEventMapper() },
-                // { typeof(HistoryRecordUpdatedDomainEvent), new HistoryRecordUpdatedEventMapper() },
-                // { typeof(HistoryRecordDeletedDomainEvent), new HistoryRecordDeletedEventMapper() }
             };
 
             return new EventMapperFactory(mappers);

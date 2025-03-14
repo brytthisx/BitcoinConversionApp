@@ -16,10 +16,5 @@ public class UpdateCryptoHistoryCommandHandler(ICryptoHistoryRepository historyR
             throw new KeyNotFoundException(nameof(CryptoHistoryRecord));
         }
 
-        // cryptoHistoryRecord(request.HistoryDate, request.DefaultCurrency, request.Comment);
-
-        // await _dbContext.SaveChangesAsync(cancellationToken);
-
-        // return Unit.Value;
     }
 }
