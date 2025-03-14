@@ -25,7 +25,8 @@ To launch the project, follow these steps:
 2. Install the required dependencies:
     ```dotnet restore```
 3. Start the application:
-    ```dotnet run --project .\src\BitcoinApp.AppHost\BitcoinApp.AppHost.csproj 
+    ```
+    dotnet run --project .\src\BitcoinApp.AppHost\BitcoinApp.AppHost.csproj 
     ```
 
 ## Creating New EF Migrations
