@@ -1,0 +1,107 @@
+﻿@page "/"
+@using BitcoinApp.Web.Crypto
+
+@rendermode InteractiveServer
+
+<PageTitle>Home</PageTitle>
+
+@inject CryptoApiClient CryptoApi
+
+<h1>Bitcoin - Latest Conversion</h1>
+
+<p>This component showing data loaded from a backend API service.</p>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success" role="alert">
+        @successMessage
+    </div>
+}
+
+@if (conversions == null || conversions.Count == 0)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Original Currency</th>
+                <th>Converted Currency</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var conversion in conversions)
+            {
+                <tr>
+                    <td>@conversion.conversionDate</td>
+                    <td>@Math.Round(conversion.originalCurrency.amount) @conversion.originalCurrency.currency</td>
+                    <td>@Math.Round(conversion.convertedCurrency.amount) @conversion.convertedCurrency.currency</td>
+                    <td>
+                        <button type="button" class="btn btn-dark" @onclick="() => SaveRecord(conversion)">Save</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<LatestConversion> conversions = [];
+    private Timer? timer;
+
+    private string successMessage = "";
+
+    private async Task FetchLatestConversionAsync()
+    {
+        var conversion = await CryptoApi.GetLatestConversionAsync();
+        conversions.Add(conversion);
+    }
+
+    private async void RefreshData(object? state)
+    {
+        await FetchLatestConversionAsync();
+        // Because this method is running in a background thread,
+        // call InvokeAsync to re-render on the Blazor UI thread
+        await InvokeAsync(StateHasChanged);
+    }
+    protected override async Task OnInitializedAsync()
+    {
+        timer = new Timer(RefreshData, null, 0, 10_000);
+    }
+
+    private async void SaveRecord(LatestConversion conversion)
+    {
+        Console.WriteLine($"Saving conversion: {conversion}");
+
+        var record = new CreateHistoryRecord
+        {
+            HistoryDate = conversion.conversionDate,
+            Comment = "",
+            DefaultCurrency = new Price
+            {
+                currency = conversion.originalCurrency.currency,
+                amount = conversion.originalCurrency.amount
+            },
+            ConvertedCurrency = new Price
+            {
+                currency = conversion.convertedCurrency.currency,
+                amount = conversion.convertedCurrency.amount
+            }
+        };
+
+        await CryptoApi.CreateHistoryRecordAsync(record);
+
+        successMessage = "Record saved successfully!";
+
+    }
+
+    public void Dispose()
+    {
+        // Clean up the timer to avoid memory leaks
+        timer?.Dispose();
+    }
+}

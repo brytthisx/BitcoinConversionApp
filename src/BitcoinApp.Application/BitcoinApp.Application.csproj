@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <PackageReference Include="FluentValidation"/>
+        <PackageReference Include="MassTransit"/>
+        <PackageReference Include="Newtonsoft.Json"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\BitcoinApp.Domain\BitcoinApp.Domain.csproj"/>
+    </ItemGroup>
+
+</Project>

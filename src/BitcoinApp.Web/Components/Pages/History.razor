@@ -1,0 +1,72 @@
+﻿@page "/history"
+@using BitcoinApp.Web.Crypto
+
+@inject CryptoApiClient CryptoApi
+
+<PageTitle>Conversion History</PageTitle>
+
+<h1>Bitcoin Conversion History</h1>
+
+<p>This component shows saved Bitcoin records</p>
+
+@if (recordHistory == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Source currency</th>
+                <th>Converted currency</th>
+                <th>Comment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var record in recordHistory.Records)
+            {
+                <tr>
+                    <td>@record.ResponseObject.HistoryDate</td>
+                    <td>@record.ResponseObject.OriginalPrice.amount @record.ResponseObject.OriginalPrice.currency</td>
+                    <td>@record.ResponseObject.ConvertedPrice.amount @record.ResponseObject.ConvertedPrice.currency</td>
+                    <td>
+                        <input type="text" class="form-control" @bind="record.ResponseObject.Comment" />
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-dark" @onclick="() => SaveComment(record.ResponseObject.HistoryId, record.ResponseObject.Comment)">Save</button>
+                   
+                        <button type="button" class="btn btn-dark"  @onclick="() => DeleteRecord(record.ResponseObject.HistoryId)">Delete</button> 
+                    </td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private HistoryRecordData? recordHistory;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var records = await CryptoApi.GetCryptoHistoryRecordsAsync();
+        Console.WriteLine(records);
+        recordHistory = records;
+    }
+
+    private async Task SaveComment(HistoryId recordID, string comment)
+    {
+        await CryptoApi.SaveRecordCommentAsync(recordID, comment);
+    }
+
+    private async Task DeleteRecord(HistoryId recordID)
+    {
+        await CryptoApi.DeleteHistoryRecordAsync(recordID);
+
+        recordHistory.Records.RemoveAll(r => r.ResponseObject.HistoryId == recordID);
+    }
+
+}

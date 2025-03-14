@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <ItemGroup>
+        <ProjectReference Include="..\BitcoinApp.ServiceDefaults\BitcoinApp.ServiceDefaults.csproj"/>
+    </ItemGroup>
+
+</Project>
