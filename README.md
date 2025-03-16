@@ -41,7 +41,7 @@ To launch the project, follow these steps:
 1. Navigate to the project Root directory
 2. Install the required dependencies:
     ```dotnet restore```
-3. Start the application - docker (postman - via aspire documentation) and .net 9 SDK must be installed:
+3. Start the application - docker (postman - via aspire documentation) and .net 9 SDK must be installed, docker/postman engine must be started:
     ```
     dotnet run --project .\src\BitcoinApp.AppHost\BitcoinApp.AppHost.csproj 
     ```
