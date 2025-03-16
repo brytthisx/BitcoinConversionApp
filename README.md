@@ -7,6 +7,7 @@
 - [Key Logic Locations](#key-logic-locations)
 - [Launching the Project](#launching-the-project)
 - [Creating New EF Migrations](#creating-new-ef-migrations)
+- [DB script](#db-script)
 
 
 ## Introduction
@@ -55,3 +56,6 @@ To create new Entity Framework (EF) migrations, use the following commands:
     dotnet ef migrations add <Migration-Name> --project .\src\BitcoinApp.Infrastructure\ --startup-project .\src\BitcoinApp.AppHost\
     ```
 3. Update of the database will be applied on next project start
+
+## DB script
+Script for manual DB creation is located at root of this project: ```migrationScript.sql```

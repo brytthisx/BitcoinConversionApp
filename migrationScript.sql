@@ -25,6 +25,7 @@ CREATE TABLE [CryptoHistoryRecords] (
     [ConvertedPrice_Amount] decimal(18,2) NOT NULL,
     [ConvertedPrice_Currency] nvarchar(3) NOT NULL,
     [Comment] nvarchar(100) NOT NULL,
+    [IsDeleted] bit NOT NULL,
     CONSTRAINT [PK_CryptoHistoryRecords] PRIMARY KEY ([HistoryId])
 );
 
@@ -39,7 +40,7 @@ CREATE TABLE [DomainEvent] (
 );
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20250314165528_TargetCurrency-history', N'9.0.3');
+VALUES (N'20250316010250_InitialCreate', N'9.0.3');
 
 COMMIT;
 GO
