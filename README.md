@@ -3,6 +3,7 @@
 
 ## Table of Contents
 - [Introduction](#introduction)
+- [Aspire](#aspire)
 - [Key Logic Locations](#key-logic-locations)
 - [Launching the Project](#launching-the-project)
 - [Creating New EF Migrations](#creating-new-ef-migrations)
@@ -39,11 +40,11 @@ To launch the project, follow these steps:
 1. Navigate to the project Root directory
 2. Install the required dependencies:
     ```dotnet restore```
-3. Start the application:
+3. Start the application - docker (postman - via aspire documentation) and .net 9 SDK must be installed:
     ```
     dotnet run --project .\src\BitcoinApp.AppHost\BitcoinApp.AppHost.csproj 
     ```
-4. Aspire UI should be opened automatically (with all required services and its endpoints) 
+4. Target Aspire dashboard UI URL should be shown in console (probably https://localhost:17167) - Aspire dashboard displays all available services and their endpoints (the main ones are "webApi" and "webFrontend")
 
 
 ## Creating New EF Migrations
