@@ -9,34 +9,27 @@ public class CryptoHistoryRecord : Entity
     public Money OriginalPrice { get; private set; }
     public Money ConvertedPrice { get; private set; }
     public string Comment { get; private set; }
+    public bool IsDeleted { get; private set; } // Soft delete flag
 
-    private CryptoHistoryRecord() { }
+    private CryptoHistoryRecord() { } 
 
     public static CryptoHistoryRecord Create(DateTime historyDate, Money originalPrice, Money convertedPrice, string comment)
     {
-        return new CryptoHistoryRecord(
-            historyDate,
-            originalPrice, 
-            convertedPrice,
-            comment
-        );
+        var record = new CryptoHistoryRecord(historyDate, originalPrice, convertedPrice, comment);
+        record.AddDomainEvent(new CryptoHistoryCreatedDomainEvent(record.HistoryId.Value));
+        return record;
     }
 
-    public static CryptoHistoryRecord Update(HistoryId historyId, string comment)
-    {
-        return new CryptoHistoryRecord
-        {
-            HistoryId = historyId,
-            Comment = comment
-        };
-    }
+public void UpdateComment(string newComment)
+{
+    Comment = newComment;
+    AddDomainEvent(new CryptoHistoryUpdatedDomainEvent(HistoryId.Value, newComment));
+}
 
-    public static CryptoHistoryRecord Delete(HistoryId historyId)
+    public void MarkAsDeleted()
     {
-        return new CryptoHistoryRecord
-        {
-            HistoryId = historyId
-        };
+        IsDeleted = true;
+        AddDomainEvent(new CryptoHistoryDeletedDomainEvent(HistoryId.Value));
     }
 
     private CryptoHistoryRecord(DateTime historyDate, Money originalPrice, Money convertedPrice, string comment)
@@ -46,7 +39,5 @@ public class CryptoHistoryRecord : Entity
         OriginalPrice = originalPrice;
         ConvertedPrice = convertedPrice;
         Comment = comment;
-
-        AddDomainEvent(new CryptoHistoryCreatedDomainEvent(HistoryId.Value));
     }
 }

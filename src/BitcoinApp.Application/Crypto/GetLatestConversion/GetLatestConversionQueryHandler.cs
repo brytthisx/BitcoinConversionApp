@@ -1,14 +1,13 @@
+using MediatR;
 using BitcoinApp.Application.Shared;
-using MassTransit;
 
 namespace BitcoinApp.Application.Crypto.GetLatestConversion;
 
 public class GetLatestConversionQueryHandler(IConversionReadService conversionReadService)
-    : IConsumer<GetLatestConversionQuery>
+    : IRequestHandler<GetLatestConversionQuery, GetLatestConversionDto?>
 {
-    public async Task Consume(ConsumeContext<GetLatestConversionQuery> context)
+    public async Task<GetLatestConversionDto?> Handle(GetLatestConversionQuery request, CancellationToken cancellationToken)
     {
-        GetLatestConversionDto? record = await conversionReadService.GetLatestConversion(context.CancellationToken);
-        await context.RespondAsync(record);
+        return await conversionReadService.GetLatestConversion(cancellationToken);
     }
 }

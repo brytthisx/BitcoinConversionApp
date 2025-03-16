@@ -1,13 +1,12 @@
-﻿using BitcoinApp.Domain;
-using MassTransit.Mediator;
+﻿using MediatR;
+using BitcoinApp.Domain;
 
 namespace BitcoinApp.Infrastructure.Events;
 
 public class DomainEventDispatcher(IMediator mediator) : IDomainEventDispatcher
 {
-    public Task Dispatch(IDomainEvent domainEvent)
+    public async Task Dispatch(IDomainEvent domainEvent)
     {
-        mediator.Publish(domainEvent);
-        return Task.CompletedTask;
+        await mediator.Publish(domainEvent);
     }
 }

@@ -27,7 +27,7 @@ public class ExchangeConversionService(HttpClient httpClient, IConfiguration con
         {
             string[] columns = line.Split('|');
             if (columns[3].Trim() == targetCurrency &&
-                decimal.TryParse(columns[4].Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal rate))
+                decimal.TryParse(columns[4].Replace(",", ".").Trim(), NumberStyles.Any, CultureInfo.InvariantCulture, out decimal rate))
             {
                 return rate;
             }

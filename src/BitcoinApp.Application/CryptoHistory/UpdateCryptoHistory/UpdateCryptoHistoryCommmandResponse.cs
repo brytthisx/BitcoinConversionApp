@@ -1,4 +1,4 @@
 
 namespace BitcoinApp.Application.CryptoHistory.UpdateCryptoHistory;
 
- public sealed record UpdateCryptoHistoryCommandResponse();
+public sealed record UpdateCryptoHistoryCommandResponse(Guid HistoryId);

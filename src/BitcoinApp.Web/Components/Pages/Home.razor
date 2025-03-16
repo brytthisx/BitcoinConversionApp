@@ -71,6 +71,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         timer = new Timer(RefreshData, null, 0, 10_000);
+        await Task.CompletedTask;
     }
 
     private async void SaveRecord(LatestConversion conversion)

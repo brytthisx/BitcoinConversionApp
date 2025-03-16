@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BitcoinApp.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class TargetCurrencyhistory : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -35,7 +35,8 @@ namespace BitcoinApp.Infrastructure.Migrations
                     OriginalPrice_Currency = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
                     ConvertedPrice_Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     ConvertedPrice_Currency = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
-                    Comment = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false)
+                    Comment = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

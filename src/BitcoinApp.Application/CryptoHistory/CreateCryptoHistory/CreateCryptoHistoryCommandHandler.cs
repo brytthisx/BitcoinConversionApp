@@ -1,35 +1,31 @@
-using MassTransit;
+using MediatR;
 using BitcoinApp.Domain.CryptoHistory;
 using BitcoinApp.Domain;
 
-namespace BitcoinApp.Application.CryptoHistory.CreateCryptoHistory
+namespace BitcoinApp.Application.CryptoHistory.CreateCryptoHistory;
+
+public class CreateCryptoHistoryCommandHandler : IRequestHandler<CreateCryptoHistoryCommand, CreateCryptoHistoryCommandResponse>
 {
-    public class CreateCryptoHistoryCommandHandler : IConsumer<CreateCryptoHistoryCommand>
+    private readonly ICryptoHistoryRecordRepository _historyRepository;
+
+    public CreateCryptoHistoryCommandHandler(
+        ICryptoHistoryRecordRepository historyRepository)
     {
-        private readonly ICryptoHistoryRepository _historyRepository;
-        private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly CryptoHistoryDomainService _historyDomainService;
+        _historyRepository = historyRepository;
+    }
 
-        public CreateCryptoHistoryCommandHandler(
-            ICryptoHistoryRepository historyRepository,
-            IDateTimeProvider dateTimeProvider,
-            CryptoHistoryDomainService historyDomainService)
-        {
-            _historyRepository = historyRepository;
-            _dateTimeProvider = dateTimeProvider;
-            _historyDomainService = historyDomainService;
-        }
+    public async Task<CreateCryptoHistoryCommandResponse> Handle(CreateCryptoHistoryCommand request, CancellationToken cancellationToken)
+    {
+        var record = CryptoHistoryRecord.Create(
+            request.HistoryDate,
+            new Money(request.DefaultCurrency.Amount, request.DefaultCurrency.Currency),
+            new Money(request.ConvertedCurrency.Amount, request.ConvertedCurrency.Currency),
+            request.Comment
+        );
 
-        public async Task Consume(ConsumeContext<CreateCryptoHistoryCommand> context)
-        {
-            var record = CryptoHistoryRecord.Create(
-                context.Message.HistoryDate,
-                context.Message.defaultCurrency,
-                context.Message.convertedCurrency,
-                context.Message.Comment);
+        await _historyRepository.AddAsync(record, cancellationToken);
+        await _historyRepository.SaveChangesAsync(cancellationToken);
 
-            await _historyRepository.AddAsync(record, context.CancellationToken);
-            await context.RespondAsync(new CreateCryptoHistoryCommandResponse(record.HistoryId));
-        }
+        return new CreateCryptoHistoryCommandResponse(record.HistoryId);
     }
 }

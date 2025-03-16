@@ -1,32 +1,32 @@
-using MassTransit;
+using MediatR;
 using BitcoinApp.Domain.CryptoHistory;
 using BitcoinApp.Domain;
+using BitcoinApp.Domain.CryptoHistory.DomainEvents;
 
-namespace BitcoinApp.Application.CryptoHistory.DeleteCryptoHistory
+namespace BitcoinApp.Application.CryptoHistory.DeleteCryptoHistory;
+
+public class DeleteCryptoHistoryCommandHandler(ICryptoHistoryRecordRepository historyRepository)
+    : IRequestHandler<DeleteCryptoHistoryCommand, DeleteCryptoHistoryCommandResponse>
 {
-    public class DeleteCryptoHistoryCommandHandler : IConsumer<DeleteCryptoHistoryCommand>
+    public async Task<DeleteCryptoHistoryCommandResponse> Handle(DeleteCryptoHistoryCommand request, CancellationToken cancellationToken)
     {
-        private readonly ICryptoHistoryRepository _historyRepository;
-        private readonly IDateTimeProvider _dateTimeProvider;
-        private readonly CryptoHistoryDomainService _historyDomainService;
+        var record = await historyRepository.GetByIdAsync(request.HistoryId, cancellationToken);
 
-        public DeleteCryptoHistoryCommandHandler(
-            ICryptoHistoryRepository historyRepository,
-            IDateTimeProvider dateTimeProvider,
-            CryptoHistoryDomainService historyDomainService)
+        if (record == null)
         {
-            _historyRepository = historyRepository;
-            _dateTimeProvider = dateTimeProvider;
-            _historyDomainService = historyDomainService;
+            return null; // Return null to indicate not found
         }
 
-        public async Task Consume(ConsumeContext<DeleteCryptoHistoryCommand> context)
-        {
-            var record = CryptoHistoryRecord.Delete(
-                context.Message.historyId);
+        // Mark entity as deleted instead of trying to remove it
+        historyRepository.Remove(record);
 
-            await _historyRepository.DeleteAsync(record.HistoryId, context.CancellationToken);
-            await context.RespondAsync(new DeleteCryptoHistoryCommandResponse());
-        }
+        // Persist changes
+        await historyRepository.SaveChangesAsync(cancellationToken);
+
+        // Publish an event for the deletion (optional)
+        // You can use MediatR.Publish() for domain events if needed
+
+        return new DeleteCryptoHistoryCommandResponse(record.HistoryId.Value)
+        ;
     }
 }

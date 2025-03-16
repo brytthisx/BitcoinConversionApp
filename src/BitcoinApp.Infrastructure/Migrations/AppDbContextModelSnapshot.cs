@@ -35,6 +35,9 @@ namespace BitcoinApp.Infrastructure.Migrations
                     b.Property<DateTime>("HistoryDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("HistoryId");
 
                     b.ToTable("CryptoHistoryRecords");

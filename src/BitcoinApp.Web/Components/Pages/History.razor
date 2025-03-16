@@ -1,6 +1,8 @@
 ﻿@page "/history"
 @using BitcoinApp.Web.Crypto
 
+@rendermode InteractiveServer
+
 @inject CryptoApiClient CryptoApi
 
 <PageTitle>Conversion History</PageTitle>
@@ -36,9 +38,11 @@ else
                         <input type="text" class="form-control" @bind="record.ResponseObject.Comment" />
                     </td>
                     <td>
-                        <button type="button" class="btn btn-dark" @onclick="() => SaveComment(record.ResponseObject.HistoryId, record.ResponseObject.Comment)">Save</button>
-                   
-                        <button type="button" class="btn btn-dark"  @onclick="() => DeleteRecord(record.ResponseObject.HistoryId)">Delete</button> 
+                        <button type="button" class="btn btn-dark"
+                            @onclick="@(async () => SaveComment(record.ResponseObject.HistoryId, record.ResponseObject.Comment))">Save</button>
+
+                        <button type="button" class="btn btn-dark"
+                            @onclick="() => DeleteRecord(record.ResponseObject.HistoryId)">Delete</button>
                     </td>
 
                 </tr>
@@ -57,16 +61,22 @@ else
         recordHistory = records;
     }
 
-    private async Task SaveComment(HistoryId recordID, string comment)
+    private async void SaveComment(HistoryId recordID, string comment)
     {
         await CryptoApi.SaveRecordCommentAsync(recordID, comment);
     }
 
-    private async Task DeleteRecord(HistoryId recordID)
+    private async void DeleteRecord(HistoryId recordID)
     {
+
+        Console.WriteLine($"DeleteRecord called with ID: {recordID}");
+
         await CryptoApi.DeleteHistoryRecordAsync(recordID);
 
         recordHistory.Records.RemoveAll(r => r.ResponseObject.HistoryId == recordID);
+
+        await InvokeAsync(StateHasChanged);
     }
+
 
 }

@@ -2,7 +2,7 @@ using BitcoinApp.Domain.CryptoHistory;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace BitcoinApp.Infrastructure.Persistence.Database.Configuration.Domain;
+namespace BitcoinApp.Infrastructure.Repositories;
 
 public class CryptoHistoryRecordsConfiguration : IEntityTypeConfiguration<CryptoHistoryRecord>
 {

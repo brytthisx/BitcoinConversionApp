@@ -1,13 +1,11 @@
-using BitcoinApp.Application.CryptoHistory;
-using MassTransit.Mediator;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 using BitcoinApp.Application.CryptoHistory.GetCryptoHistory;
-using BitcoinApp.Infrastructure.Persistence.Database.MsSql;
-using MassTransit;
+using BitcoinApp.Application.CryptoHistory.CreateCryptoHistory;
 using BitcoinApp.Application.CryptoHistory.UpdateCryptoHistory;
 using BitcoinApp.Application.CryptoHistory.DeleteCryptoHistory;
-
+using BitcoinApp.Domain.CryptoHistory;
 
 namespace BitcoinApp.WebApi.Controllers;
 
@@ -15,75 +13,66 @@ namespace BitcoinApp.WebApi.Controllers;
 [ApiController]
 [SwaggerTag(
     "Handles all operations related to bitcoin price history records, including creation, retrieval, updating, and deletion.")]
-public class CryptoHistoryController(IMediator mediator, AppDbContext context) : ControllerBase
+public class CryptoHistoryController(IMediator mediator) : ControllerBase
 {
-    private readonly AppDbContext _context = context;
+    private readonly IMediator _mediator = mediator;
 
-    [HttpGet("{recordId}")]
+    [HttpGet("{historyId:guid}")]
     [SwaggerOperation("Get a single record")]
     [ProducesResponseType(typeof(GetCryptoHistoryRecordDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetRecord([FromRoute] GetCryptoHistoryRecordQuery query)
+    public async Task<IActionResult> GetRecord(Guid historyId, CancellationToken cancellationToken)
     {
-        IRequestClient<GetCryptoHistoryRecordQuery>? client =
-            mediator.CreateRequestClient<GetCryptoHistoryRecordQuery>();
-        Response<GetCryptoHistoryRecordDto>? response = await client.GetResponse<GetCryptoHistoryRecordDto>(query);
+        var response = await _mediator.Send(new GetCryptoHistoryRecordQuery(historyId), cancellationToken);
 
-        return Ok(response.Message);
+        if (response == null)
+            return NotFound();
+
+        return Ok(response);
     }
 
     [HttpGet]
     [SwaggerOperation("Get all records")]
     [ProducesResponseType(typeof(GetCryptoHistoryRecordsDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetRecords()
+    public async Task<IActionResult> GetRecords(CancellationToken cancellationToken)
     {
-        IRequestClient<GetCryptoHistoryRecordsQuery> client =
-            mediator.CreateRequestClient<GetCryptoHistoryRecordsQuery>();
-        Response<GetCryptoHistoryRecordsDto> response =
-            await client.GetResponse<GetCryptoHistoryRecordsDto>(new GetCryptoHistoryRecordsQuery());
+        var response = await _mediator.Send(new GetCryptoHistoryRecordsQuery(), cancellationToken);
 
-        return Ok(response.Message);
+        return Ok(response);
     }
 
     [HttpPost]
     [SwaggerOperation("Create a new record")]
     [ProducesResponseType(typeof(CreateCryptoHistoryCommandResponse), StatusCodes.Status200OK)]
-    public async Task<IActionResult> CreateRecord([FromBody] CreateCryptoHistoryCommand request)
+    public async Task<IActionResult> CreateRecord([FromBody] CreateCryptoHistoryCommand request, CancellationToken cancellationToken)
     {
-        IRequestClient<CreateCryptoHistoryCommand>?
-            client = mediator.CreateRequestClient<CreateCryptoHistoryCommand>();
-        Response<CreateCryptoHistoryCommandResponse>? response =
-            await client.GetResponse<CreateCryptoHistoryCommandResponse>(request);
+        var response = await _mediator.Send(request, cancellationToken);
 
-        return CreatedAtAction(nameof(GetRecord), new { recordId = response.Message.HistoryId }, response.Message);
+        return CreatedAtAction(nameof(GetRecord), new { historyId = response.HistoryId.Value }, response);
     }
 
-    [HttpPatch("{historyId}")]
+    [HttpPatch("{historyId:guid}")]
     [SwaggerOperation("Update a record's comment")]
-    [ProducesResponseType(StatusCodes.Status200OK)] 
+    [ProducesResponseType(typeof(UpdateCryptoHistoryCommandResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateRecordComment([FromRoute] UpdateCryptoHistoryCommand request)
+    public async Task<IActionResult> UpdateRecord(Guid historyId, [FromBody] UpdateCryptoHistoryDto data, CancellationToken cancellationToken)
     {
-        IRequestClient<UpdateCryptoHistoryCommand>? client =
-            mediator.CreateRequestClient<UpdateCryptoHistoryCommand>();
-        Response<UpdateCryptoHistoryCommandResponse>? response =
-            await client.GetResponse<UpdateCryptoHistoryCommandResponse>(request);
+        var command = new UpdateCryptoHistoryCommand(new HistoryId(historyId), data);
+        var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Message);
+        return response != null ? Ok(response) : NotFound();
     }
 
-    [HttpDelete("{historyId}")]
+    [HttpDelete("{historyId:guid}")]
     [SwaggerOperation("Delete a record")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteRecord([FromRoute] DeleteCryptoHistoryCommand request)
+    public async Task<IActionResult> DeleteRecord(Guid historyId, CancellationToken cancellationToken)
     {
-        IRequestClient<DeleteCryptoHistoryCommand>? client =
-            mediator.CreateRequestClient<DeleteCryptoHistoryCommand>();
-        Response<DeleteCryptoHistoryCommandResponse>? response =
-            await client.GetResponse<DeleteCryptoHistoryCommandResponse>(request);
+        var command = new DeleteCryptoHistoryCommand(new HistoryId(historyId));
+        var response = await _mediator.Send(command, cancellationToken);
 
-        return Ok(response.Message);
+        return response != null ? Ok(response) : NotFound();
     }
 }

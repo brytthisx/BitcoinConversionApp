@@ -1,16 +1,13 @@
-using MassTransit;
+using MediatR;
 using BitcoinApp.Application.Shared;
 
 namespace BitcoinApp.Application.CryptoHistory.GetCryptoHistory;
 
 public class GetCryptoHistoryRecordsQueryHandler(ICryptoHistoryReadService cryptoHistoryReadService)
-    : IConsumer<GetCryptoHistoryRecordsQuery>
+    : IRequestHandler<GetCryptoHistoryRecordsQuery, GetCryptoHistoryRecordsDto>
 {
-    public async Task Consume(ConsumeContext<GetCryptoHistoryRecordsQuery> context)
+    public async Task<GetCryptoHistoryRecordsDto> Handle(GetCryptoHistoryRecordsQuery request, CancellationToken cancellationToken)
     {
-        GetCryptoHistoryRecordsDto? records =
-            await cryptoHistoryReadService.GetCryptoHistoryRecords(context.CancellationToken);
-
-        await context.RespondAsync(records);
+        return await cryptoHistoryReadService.GetCryptoHistoryRecords(cancellationToken);
     }
 }

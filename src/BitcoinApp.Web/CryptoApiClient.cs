@@ -34,7 +34,7 @@ public class CryptoApiClient(HttpClient httpClient)
 
     public async Task SaveRecordCommentAsync(HistoryId historyId, string comment, CancellationToken cancellationToken = default)
     {
-        var response = await httpClient.PatchAsJsonAsync($"/api/CryptoHistory{historyId}",comment , cancellationToken);
+        var response = await httpClient.PatchAsJsonAsync($"/api/CryptoHistory/{historyId.Value}", new { comment }, cancellationToken);
 
         response.EnsureSuccessStatusCode();
 
@@ -43,7 +43,7 @@ public class CryptoApiClient(HttpClient httpClient)
 
     public async Task DeleteHistoryRecordAsync(HistoryId historyId, CancellationToken cancellationToken = default)
     {
-        var response = await httpClient.DeleteAsync($"/api/CryptoHistory/{historyId}", cancellationToken);
+        var response = await httpClient.DeleteAsync($"/api/CryptoHistory/{historyId.Value}", cancellationToken);
 
         response.EnsureSuccessStatusCode();
     }

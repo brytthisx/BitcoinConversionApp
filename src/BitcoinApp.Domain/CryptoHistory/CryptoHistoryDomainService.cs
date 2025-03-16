@@ -1,6 +1,6 @@
 namespace BitcoinApp.Domain.CryptoHistory;
 
-public class CryptoHistoryDomainService(ICryptoHistoryRepository cryptoHistoryRepository)
+public class CryptoHistoryDomainService(ICryptoHistoryRecordRepository cryptoHistoryRepository)
 {
-    private readonly ICryptoHistoryRepository _cryptoHistoryRepository = cryptoHistoryRepository;
+    private readonly ICryptoHistoryRecordRepository _cryptoHistoryRepository = cryptoHistoryRepository;
 }

@@ -1,7 +1,4 @@
-﻿using BitcoinApp.Application.CryptoHistory.CreateCryptoHistory;
-using BitcoinApp.Domain;
-using MassTransit;
-using MassTransit.Internals;
+﻿using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,37 +14,23 @@ public static class Extensions
 
         Console.WriteLine("Configuring MassTransit");
         Console.WriteLine(messaging);
-        builder.Services.AddMediator(cfg =>
+
+        builder.Services.AddMassTransit(x =>
         {
-            AddMediatorConsumersFromAssembly(cfg);
+            x.SetKebabCaseEndpointNameFormatter();
 
-            cfg.ConfigureMediator((context, cfg) =>
+            x.AddConsumers(typeof(Extensions).Assembly);
+
+            x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.UseConsumeFilter(typeof(EventsFilter<>), context,
-                   x => x.Include(type => !type.HasInterface<IDomainEvent>()));
-            });
+                Console.WriteLine("RabbitMQ is being used");
+                Console.WriteLine(messaging);
 
-            builder.Services.AddMassTransit(x =>
-            {
-                //below Consumers for RabbitMq
-
-                x.SetKebabCaseEndpointNameFormatter();
-
-                x.UsingRabbitMq((context, cfg) =>
-                {
-                    Console.WriteLine("RabbitMq is being used");
-                    Console.WriteLine(messaging);
-                    cfg.Host(new Uri(messaging), c => { });
-
-                    cfg.ConfigureEndpoints(context);
-                });
+                cfg.Host(new Uri(messaging), c => { });
+                cfg.ConfigureEndpoints(context);
             });
         });
-        return builder;
-    }
 
-    private static void AddMediatorConsumersFromAssembly(IMediatorRegistrationConfigurator cfg)
-    {
-        cfg.AddConsumers(typeof(CreateCryptoHistoryCommandHandler).Assembly);
+        return builder;
     }
 }
